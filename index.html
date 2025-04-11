@@ -2,45 +2,73 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>وب اپ تلگرام</title>
+  <title>وب‌اپ تلگرام</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- لود اسکریپت رسمی تلگرام -->
+  <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
+
   <style>
     body {
       font-family: sans-serif;
       direction: rtl;
       text-align: center;
       margin-top: 100px;
+      background-color: #f9f9f9;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
     }
     button {
-      padding: 10px 20px;
-      font-size: 18px;
+      padding: 12px 25px;
+      font-size: 16px;
       background-color: #0088cc;
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
     }
+    #status {
+      margin-top: 20px;
+      font-size: 14px;
+      color: green;
+    }
   </style>
 </head>
 <body>
-  <h2>وب‌اپ تلگرام</h2>
-  <p>برای ارسال داده به ربات، روی دکمه زیر کلیک کن:</p>
-  <button onclick="sendToBot()">ارسال تست به ربات</button>
 
-  <p id="status"></p>
+  <div class="box">
+    <h2>وب‌اپ تلگرام</h2>
+    <p>برای ارسال پیام به ربات، دکمه زیر را بزن:</p>
+    <button onclick="sendToBot()">ارسال تست به ربات</button>
+    <p id="status">⏳ اتصال در حال بررسی...</p>
+  </div>
 
   <script>
-    let tg = window.Telegram.WebApp;
-    tg.ready();
+    Telegram.WebApp.ready();
 
-    document.getElementById("status").innerHTML = "✅ اتصال با تلگرام برقرار است.";
+    const status = document.getElementById("status");
+
+    if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+      status.innerText = "✅ اتصال با تلگرام برقرار شد.";
+    } else {
+      status.innerText = "❌ این صفحه در داخل تلگرام باز نشده است.";
+    }
 
     function sendToBot() {
-      if (tg && tg.sendData) {
-        tg.sendData("سلام از طرف وب‌اپ! 🌟");
+      if (Telegram.WebApp && Telegram.WebApp.sendData) {
+        Telegram.WebApp.sendData("سلام! این پیام از WebApp ارسال شده است ✅");
+        status.innerText = "📨 پیام به ربات ارسال شد.";
       } else {
-        alert("ارسال داده به تلگرام پشتیبانی نمی‌شود.");
+        status.innerText = "❌ WebApp هنوز آماده نیست.";
       }
     }
   </script>
+
 </body>
 </html>
