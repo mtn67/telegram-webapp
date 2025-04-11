@@ -2,83 +2,95 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>وب‌اپ تلگرام</title>
+  <title>فرم ارسال به ربات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
-
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: sans-serif;
       direction: rtl;
       text-align: center;
-      margin-top: 80px;
-      background-color: #f0f0f0;
+      background-color: #f7f7f7;
+      padding-top: 100px;
     }
-    .box {
+    .form-box {
       background: white;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 450px;
+      max-width: 400px;
       margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input {
+      padding: 10px;
+      width: 90%;
+      margin-top: 15px;
+      font-size: 16px;
     }
     button {
-      padding: 12px 25px;
+      padding: 10px 25px;
       font-size: 16px;
       background-color: #0088cc;
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      margin-top: 20px;
     }
     #status {
-      margin-top: 15px;
+      margin-top: 20px;
       font-size: 15px;
       color: green;
-    }
-    #userData {
-      margin-top: 25px;
-      text-align: left;
-      direction: ltr;
-      background: #eee;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 13px;
-      overflow-x: auto;
-      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h2>وب‌اپ تلگرام</h2>
-    <p>برای ارسال پیام به ربات، دکمه زیر را بزن:</p>
-    <button onclick="sendToBot()">ارسال تست به ربات</button>
-    <p id="status">⏳ اتصال در حال بررسی...</p>
-    <div id="userData"></div>
+  <div class="form-box">
+    <h3>فرم ثبت نام</h3>
+    <input type="text" id="name" placeholder="نام خود را وارد کنید" />
+    <br>
+    <button onclick="sendName()">ارسال به ربات</button>
+    <p id="status">در حال اتصال به تلگرام...</p>
   </div>
 
   <script>
     Telegram.WebApp.ready();
 
     const status = document.getElementById("status");
-    const output = document.getElementById("userData");
+    const chat_id = Telegram.WebApp.initDataUnsafe?.user?.id;
 
-    function sendToBot() {
-      const user = Telegram.WebApp.initDataUnsafe.user;
+    if (chat_id) {
+      status.innerText = "✅ اتصال برقرار است.";
+    } else {
+      status.innerText = "❌ لطفاً این فرم را از داخل تلگرام باز کنید.";
+    }
 
-      if (Telegram.WebApp && Telegram.WebApp.sendData && user) {
-        Telegram.WebApp.sendData("سلام! این پیام از WebApp ارسال شد ✅");
-        status.innerText = "📨 پیام ارسال شد ✅";
-
-        // نمایش اطلاعات کاربر
-        output.innerText = JSON.stringify(user, null, 2);
-      } else {
-        status.innerText = "❌ WebApp آماده نیست یا اطلاعات کاربر در دسترس نیست.";
-        output.innerText = "";
+    function sendName() {
+      const name = document.getElementById("name").value.trim();
+      if (!name) {
+        status.innerText = "⚠️ لطفاً نام را وارد کنید.";
+        return;
       }
+
+      fetch("https://yourdomain.com/submit.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chat_id,
+          name: name
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          status.innerText = "✅ ارسال شد!";
+        } else {
+          status.innerText = "❌ ارسال ناموفق.";
+        }
+      })
+      .catch(() => {
+        status.innerText = "❌ خطا در ارتباط با سرور.";
+      });
     }
   </script>
 
